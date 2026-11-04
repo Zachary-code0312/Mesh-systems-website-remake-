@@ -211,3 +211,19 @@ body.owners { background: var(--paper); min-height: 100vh; min-height: 100svh; }
 .o-item__nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 640px) { .o-item__nums { grid-template-columns: minmax(0, 0.7fr) repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 899px) { .o-price { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* App mode: header actions, install button, iPhone notch and home bar */
+.o-bar__actions { grid-area: logout; display: flex; align-items: center; gap: 8px; }
+.o-install { font: inherit; font-size: 0.92rem; font-weight: 600; color: #fff; background: var(--blue-btn); border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer; }
+.o-install:hover { background: var(--blue-btn-hover); }
+.o-bar { padding-top: env(safe-area-inset-top); }
+.o-bar__inner, .o-main { padding-left: max(var(--gutter), env(safe-area-inset-left)); padding-right: max(var(--gutter), env(safe-area-inset-right)); }
+.o-main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+.o-toast { bottom: calc(24px + env(safe-area-inset-bottom)); }
+.o-steps { margin: 14px 0; padding-left: 0; list-style: none; display: grid; gap: 10px; font-size: 0.95rem; }
+.o-steps li { padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); }
+@media (display-mode: standalone) { .o-install { display: none !important; } }
+/* Let the totals panel stay in view while scrolling long quotes on wide screens. */
+@media (min-width: 1000px) { .o-grid > .o-col--side { align-self: stretch; } .o-sticky { top: calc(88px + env(safe-area-inset-top)); } }
+@media (min-width: 1000px) { .o-col--side { align-content: start; } .o-col--side > .o-sticky { align-self: start; } }
+.o-totals { column-gap: 0; } .o-totals dd { padding-left: 12px; }

@@ -1,0 +1,17 @@
+{
+  "name": "Mesh Owners",
+  "short_name": "Mesh Owners",
+  "description": "Quotes, price list and settings for the Mesh Systems owners.",
+  "id": "/owners",
+  "start_url": "/owners",
+  "scope": "/owners",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d1420",
+  "theme_color": "#0d1420",
+  "icons": [
+    { "src": "/assets/owners/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/owners/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/owners/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

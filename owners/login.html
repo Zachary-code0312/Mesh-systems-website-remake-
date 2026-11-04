@@ -2,18 +2,24 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Owners sign in | Mesh Systems</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0d1420">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/assets/owners/manifest.json">
+<meta name="application-name" content="Mesh Owners">
+<meta name="apple-mobile-web-app-title" content="Mesh Owners">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/assets/owners/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/styles.css">
 <style>
-  body { background: var(--ink); min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; }
+  body { background: var(--ink); min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); }
   .login { width: 100%; max-width: 420px; }
   .login .logo { margin-bottom: 28px; }
   .login-card { background: var(--card); border-radius: 22px; padding: clamp(24px, 6vw, 36px); box-shadow: var(--shadow-lg); }

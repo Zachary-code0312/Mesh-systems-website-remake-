@@ -2,18 +2,24 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Owners | Mesh Systems</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0d1420">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/assets/owners/manifest.json">
+<meta name="application-name" content="Mesh Owners">
+<meta name="apple-mobile-web-app-title" content="Mesh Owners">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/assets/owners/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/styles.css">
-<link rel="stylesheet" href="/owners/owners.css">
-<script src="/owners/owners.js" defer></script>
+<link rel="stylesheet" href="/assets/owners/owners.css">
+<script src="/assets/owners/owners.js" defer></script>
 </head>
 <body class="owners">
 <header class="o-bar">
@@ -24,7 +30,10 @@
       <a href="#prices" data-tab="prices">Price list</a>
       <a href="#settings" data-tab="settings">Settings</a>
     </nav>
-    <a class="o-logout" href="/owners/logout">Log out</a>
+    <div class="o-bar__actions">
+      <button class="o-install" type="button" id="install-app" hidden>Install app</button>
+      <a class="o-logout" href="/owners/logout">Log out</a>
+    </div>
   </div>
 </header>
 
@@ -182,6 +191,16 @@
           <div class="field full"><label for="s-terms">Default terms</label><textarea id="s-terms" rows="5" data-s="terms" placeholder="e.g. payment terms, deposit, what's included"></textarea></div>
         </div>
         <p class="o-hint" id="next-number-preview"></p>
+      </div>
+      <div class="o-card" id="install-card">
+        <h2>Use it as an app</h2>
+        <p class="o-sub" id="install-status">Add Mesh Owners to your home screen or computer. It opens full screen with its own icon, and you stay signed in.</p>
+        <ul class="o-steps">
+          <li><strong>iPhone or iPad:</strong> open this page in Safari, tap the Share button, then <em>Add to Home Screen</em>.</li>
+          <li><strong>Android:</strong> in Chrome, tap the &#8942; menu, then <em>Install app</em> (or <em>Add to Home screen</em>).</li>
+          <li><strong>Computer:</strong> in Chrome or Edge, click the install icon at the right of the address bar, or the <em>Install app</em> button at the top of this page.</li>
+        </ul>
+        <p class="o-hint">On iPhone, the home screen app keeps its own saved quotes, separate from Safari. Use a backup file to move quotes from one to the other.</p>
       </div>
       <div class="o-card">
         <h2>Backup and other devices</h2>

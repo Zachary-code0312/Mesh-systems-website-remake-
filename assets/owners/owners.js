@@ -619,6 +619,29 @@
     d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
   });
 
+  /* ---------- Install as an app ---------- */
+  var installPrompt = null;
+  var installBtn = $("#install-app");
+  var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    installPrompt = e;
+    if (!standalone && installBtn) installBtn.hidden = false;
+  });
+  if (installBtn) installBtn.addEventListener("click", function () {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function (choice) {
+      if (choice.outcome === "accepted") installBtn.hidden = true;
+      installPrompt = null;
+    });
+  });
+  window.addEventListener("appinstalled", function () {
+    if (installBtn) installBtn.hidden = true;
+    toast("Installed. Open Mesh Owners from your home screen or apps.");
+  });
+  if (standalone && $("#install-status")) $("#install-status").textContent = "You're using Mesh Owners as an app.";
+
   /* ---------- Start ---------- */
   if (!storageOk) $("#storage-warning").hidden = false;
   route();
