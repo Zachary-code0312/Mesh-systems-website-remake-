@@ -54,7 +54,9 @@
     }
     return s;
   }
+  var pending = false; // true while a change is waiting to be saved
   function save() {
+    pending = false;
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
       if (navigator.storage && navigator.storage.persist && !save.asked) { save.asked = true; navigator.storage.persist().catch(function () {}); }
@@ -136,7 +138,7 @@
     var target = keys.reduce(function (o, k) { return o[k] = o[k] || {}; }, obj);
     target[last] = value;
   }
-  function debounce(fn, ms) { var t; return function () { var a = arguments; clearTimeout(t); t = setTimeout(function () { fn.apply(null, a); }, ms); }; }
+  function debounce(fn, ms) { var t; return function () { var a = arguments; pending = true; clearTimeout(t); t = setTimeout(function () { fn.apply(null, a); }, ms); }; }
   function toast(msg) {
     var el = $("#toast"); el.textContent = msg; el.classList.add("is-visible");
     clearTimeout(toast.t); toast.t = setTimeout(function () { el.classList.remove("is-visible"); }, 2600);
@@ -290,8 +292,14 @@
     setSaved(false); refresh(); saveSoon();
   }
   // Never lose the last few keystrokes when the page is closed or hidden.
-  window.addEventListener("pagehide", function () { save(); });
-  document.addEventListener("visibilitychange", function () { if (document.hidden) save(); });
+  window.addEventListener("pagehide", function () { if (pending) save(); });
+  document.addEventListener("visibilitychange", function () { if (document.hidden && pending) save(); });
+  // If the owners area is open in another tab, pick up its changes.
+  window.addEventListener("storage", function (e) {
+    if (e.key !== KEY || pending) return;
+    state = load();
+    route();
+  });
   function setSaved(done) {
     var el = $("#saved-indicator");
     el.textContent = done ? (storageOk ? "Saved" : "Not saved") : "Saving…";
