@@ -53,6 +53,28 @@ python3 -m http.server 8000
 
 `404.html` uses links that start with `/`, so it works best on the real domain (or any host where the site sits at the root).
 
+## Owners area (`/owners`)
+
+A private area for the owners, with:
+- **Quotes:** customer and project details, line items grouped by service, discount, VAT, deposit, and a private cost and margin box. Saves as you type. Statuses (draft, sent, accepted, declined) with totals for each.
+- **Printable quote:** a branded A4 quote, which you can print or save as a PDF.
+- **Price list:** your usual items with your price and your cost, ready to add to quotes.
+- **Settings:** business details shown on quotes, quote numbering, VAT, default terms, and backup files.
+
+**Switching it on (Vercel):**
+1. In the Vercel project, go to **Settings → Environment Variables**.
+2. Add `OWNER_PASSWORD` with a long password, at least 12 characters (four or five random words works well).
+3. Redeploy: **Deployments → the latest one → ⋯ → Redeploy**. Environment variable changes only apply to new deployments.
+4. Visit `/owners` and sign in.
+
+Until `OWNER_PASSWORD` is set, the owners area is locked for everyone. Changing the password signs everyone out.
+
+**How it's protected:** `middleware.js` runs on Vercel's servers before any `/owners` page is sent. Without a valid sign-in, all anyone gets is the login page. Signing in sets a secure, signed cookie that lasts 30 days ("Keep me signed in") or 12 hours. The password is never stored in the code. This only works on Vercel. On other hosts, or when opening the files directly, `/owners` isn't protected.
+
+**Where the data lives:** quotes, prices and settings are saved in the browser on each device (localStorage). Nothing is uploaded. To move data between devices, or between the two owners, use **Settings → Save backup file**, then **Import backup** on the other device. Importing combines the two, keeping the newest version of each quote. Back up regularly: clearing the browser's data deletes it.
+
+The code for the owners area is visible to anyone while this repository is public, but no prices or quotes are stored in it. To keep the code private too, make the repository private on GitHub (Vercel keeps working).
+
 ## Contact form
 
 By default, the form checks the fields, then opens the visitor's email app with the enquiry ready to send to info@meshsystems.co.uk (subject "Website Enquiry"). That works anywhere with no setup.
@@ -69,6 +91,7 @@ The form then posts the enquiry as JSON and shows a thank-you message.
 
 - **Styles:** `assets/css/styles.css`. Colours are set once at the top: brand blue `#3d85c6` (from the logo), plus a deeper blue for buttons and links so text stays readable.
 - **Scripts:** `assets/js/main.js` (menus, scroll reveals, hero animation, demos, contact form).
+- **Owners area:** `owners/` (pages, `owners.css`, `owners.js`) and `middleware.js` (the login check). `package.json` only marks the project as using modern JavaScript modules, which Vercel needs for `middleware.js`. There's still no build step.
 - **Header and footer** are repeated in every page. To change a menu item, phone number or address, use find-and-replace across all `.html` files.
 - **Fonts:** Poppins (headings, matching the logo) and Inter (body text), loaded from Google Fonts.
 - **Images:** the site uses drawn illustrations rather than photos, so it's complete as it stands. Real project photos would be a good addition: put them in `assets/img/` and add `<img>` tags where you want them, with `alt` text describing each photo.

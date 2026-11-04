@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owners | Mesh Systems</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0d1420">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/owners/owners.css">
+<script src="/owners/owners.js" defer></script>
+</head>
+<body class="owners">
+<header class="o-bar">
+  <div class="container o-bar__inner">
+    <div class="o-brand"><a class="logo" href="#quotes" aria-label="Owners home">mesh<span class="logo__dot" aria-hidden="true"></span></a><span class="o-pill">Owners</span></div>
+    <nav class="o-tabs" aria-label="Owners sections">
+      <a href="#quotes" data-tab="quotes">Quotes</a>
+      <a href="#prices" data-tab="prices">Price list</a>
+      <a href="#settings" data-tab="settings">Settings</a>
+    </nav>
+    <a class="o-logout" href="/owners/logout">Log out</a>
+  </div>
+</header>
+
+<main class="container o-main" id="main">
+  <p class="o-banner o-banner--warn" id="storage-warning" hidden>This browser isn't letting the page save anything (it may be in private browsing). Anything you do here will be lost when you close the page.</p>
+
+  <!-- Quotes list -->
+  <section data-view="quotes" aria-labelledby="quotes-title">
+    <div class="o-head">
+      <div><h1 id="quotes-title" class="o-title">Quotes</h1><p class="o-sub">Saved on this device. Back up regularly in Settings.</p></div>
+      <button class="btn btn--primary" type="button" data-action="new-quote">New quote</button>
+    </div>
+    <p class="o-banner" id="backup-reminder" hidden></p>
+    <div class="o-stats" id="quote-stats"></div>
+    <div class="o-toolbar">
+      <input class="o-search" type="search" id="quote-search" placeholder="Search by customer, number or project" aria-label="Search quotes">
+      <div class="seg o-filter" role="group" aria-label="Filter by status" id="quote-filter">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="draft" aria-pressed="false">Draft</button>
+        <button type="button" data-filter="sent" aria-pressed="false">Sent</button>
+        <button type="button" data-filter="accepted" aria-pressed="false">Accepted</button>
+        <button type="button" data-filter="declined" aria-pressed="false">Declined</button>
+      </div>
+    </div>
+    <div class="o-list" id="quote-list"></div>
+  </section>
+
+  <!-- Quote editor -->
+  <section data-view="editor" hidden aria-labelledby="editor-title">
+    <div class="o-editor-bar">
+      <a class="o-back" href="#quotes">&larr; All quotes</a>
+      <span class="o-saved" id="saved-indicator" aria-live="polite">Saved</span>
+    </div>
+    <div class="o-head">
+      <div>
+        <h1 id="editor-title" class="o-title">Quote <span data-text="number"></span></h1>
+        <p class="o-sub" data-text="customerLine"></p>
+      </div>
+      <label class="o-status-select">Status
+        <select data-q="status">
+          <option value="draft">Draft</option><option value="sent">Sent</option><option value="accepted">Accepted</option><option value="declined">Declined</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="o-grid">
+      <div class="o-col">
+        <div class="o-card">
+          <h2>Quote details</h2>
+          <div class="form-grid">
+            <div class="field"><label for="q-number">Quote number</label><input id="q-number" data-q="number"></div>
+            <div class="field"><label for="q-date">Date</label><input id="q-date" type="date" data-q="date"></div>
+            <div class="field"><label for="q-valid">Valid for (days)</label><input id="q-valid" type="number" min="1" inputmode="numeric" data-q="validDays" data-num></div>
+            <div class="field"><label>Valid until</label><p class="o-static" data-text="validUntil"></p></div>
+          </div>
+        </div>
+
+        <div class="o-card">
+          <h2>Customer</h2>
+          <div class="form-grid">
+            <div class="field"><label for="c-name">Name</label><input id="c-name" data-q="customer.name" autocomplete="off"></div>
+            <div class="field"><label for="c-email">Email</label><input id="c-email" type="email" data-q="customer.email" autocomplete="off"></div>
+            <div class="field"><label for="c-phone">Phone</label><input id="c-phone" type="tel" data-q="customer.phone" autocomplete="off"></div>
+            <div class="field full"><label for="c-address">Address</label><textarea id="c-address" rows="3" data-q="customer.address"></textarea></div>
+          </div>
+        </div>
+
+        <div class="o-card">
+          <h2>Project</h2>
+          <div class="form-grid">
+            <div class="field full"><label for="p-title">Project title</label><input id="p-title" data-q="title" placeholder="e.g. Whole-home WiFi and lighting control"></div>
+            <div class="field full"><label for="p-summary">Summary for the customer</label><textarea id="p-summary" rows="4" data-q="summary" placeholder="A short description of what you'll do. Appears on the quote."></textarea></div>
+          </div>
+        </div>
+
+        <div class="o-card">
+          <div class="o-card__head"><h2>Items</h2><span class="o-hint">Prices exclude VAT</span></div>
+          <div id="items"></div>
+          <div class="btn-row o-item-actions">
+            <button class="btn btn--outline btn--sm" type="button" data-action="add-line">+ Add line</button>
+            <button class="btn btn--outline btn--sm" type="button" data-action="open-picker">+ From price list</button>
+          </div>
+        </div>
+
+        <div class="o-card">
+          <h2>Notes and terms</h2>
+          <div class="form-grid">
+            <div class="field full"><label for="q-notes">Notes for the customer</label><textarea id="q-notes" rows="3" data-q="notes" placeholder="Anything else the customer should know. Appears on the quote."></textarea></div>
+            <div class="field full"><label for="q-terms">Terms</label><textarea id="q-terms" rows="4" data-q="terms" placeholder="Payment terms, what's included, and so on. Set a default in Settings."></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="o-col o-col--side">
+        <div class="o-card o-sticky">
+          <h2>Totals</h2>
+          <div class="form-grid o-totals-form">
+            <div class="field"><label for="t-disc-type">Discount</label>
+              <select id="t-disc-type" data-q="discountType"><option value="none">None</option><option value="percent">Percent (%)</option><option value="amount">Amount (&pound;)</option></select></div>
+            <div class="field"><label for="t-disc">Discount value</label><input id="t-disc" type="number" min="0" step="any" inputmode="decimal" data-q="discount" data-num></div>
+            <div class="field"><label for="t-dep">Deposit (%)</label><input id="t-dep" type="number" min="0" max="100" step="any" inputmode="decimal" data-q="depositPct" data-num></div>
+            <div class="field"><label for="t-vat-rate">VAT rate (%)</label><input id="t-vat-rate" type="number" min="0" step="any" inputmode="decimal" data-q="vatRate" data-num></div>
+            <label class="o-check full"><input type="checkbox" data-q="vatOn"> Add VAT</label>
+          </div>
+          <dl class="o-totals" id="totals"></dl>
+          <div class="o-private" id="margin"></div>
+          <div class="o-actions">
+            <button class="btn btn--primary" type="button" data-action="preview">Preview and PDF</button>
+            <button class="btn btn--outline" type="button" data-action="email">Email customer</button>
+            <div class="o-actions__row">
+              <button class="btn btn--outline btn--sm" type="button" data-action="duplicate">Duplicate</button>
+              <button class="btn btn--outline btn--sm o-danger" type="button" data-action="delete">Delete</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Price list -->
+  <section data-view="prices" hidden aria-labelledby="prices-title">
+    <div class="o-head">
+      <div><h1 id="prices-title" class="o-title">Price list</h1><p class="o-sub">Your usual items, ready to add to quotes. Saved on this device.</p></div>
+      <button class="btn btn--primary" type="button" data-action="add-price">Add item</button>
+    </div>
+    <div class="o-toolbar"><input class="o-search" type="search" id="price-search" placeholder="Search items" aria-label="Search price list"></div>
+    <div id="price-list"></div>
+  </section>
+
+  <!-- Settings -->
+  <section data-view="settings" hidden aria-labelledby="settings-title">
+    <div class="o-head"><div><h1 id="settings-title" class="o-title">Settings</h1><p class="o-sub">Shown on your quotes, and used for new ones.</p></div></div>
+    <div class="o-grid o-grid--even">
+      <div class="o-card">
+        <h2>Business details on quotes</h2>
+        <div class="form-grid">
+          <div class="field full"><label for="s-name">Business name</label><input id="s-name" data-s="company.name"></div>
+          <div class="field full"><label for="s-address">Address</label><textarea id="s-address" rows="4" data-s="company.address"></textarea></div>
+          <div class="field full"><label for="s-phone">Phone</label><input id="s-phone" data-s="company.phone"></div>
+          <div class="field"><label for="s-email">Email</label><input id="s-email" type="email" data-s="company.email"></div>
+          <div class="field"><label for="s-web">Website</label><input id="s-web" data-s="company.website"></div>
+          <div class="field"><label for="s-vatno">VAT number</label><input id="s-vatno" data-s="company.vatNumber" placeholder="Optional"></div>
+          <div class="field"><label for="s-cono">Company number</label><input id="s-cono" data-s="company.companyNumber" placeholder="Optional"></div>
+        </div>
+      </div>
+      <div class="o-card">
+        <h2>Defaults for new quotes</h2>
+        <div class="form-grid">
+          <div class="field"><label for="s-prefix">Number prefix</label><input id="s-prefix" data-s="prefix"></div>
+          <div class="field"><label for="s-next">Next number</label><input id="s-next" type="number" min="1" inputmode="numeric" data-s="nextNumber" data-num></div>
+          <div class="field"><label for="s-valid">Valid for (days)</label><input id="s-valid" type="number" min="1" inputmode="numeric" data-s="validDays" data-num></div>
+          <div class="field"><label for="s-dep">Deposit (%)</label><input id="s-dep" type="number" min="0" max="100" step="any" inputmode="decimal" data-s="depositPct" data-num></div>
+          <div class="field"><label for="s-vat">VAT rate (%)</label><input id="s-vat" type="number" min="0" step="any" inputmode="decimal" data-s="vatRate" data-num></div>
+          <label class="o-check"><input type="checkbox" data-s="vatOn"> Add VAT by default</label>
+          <div class="field full"><label for="s-terms">Default terms</label><textarea id="s-terms" rows="5" data-s="terms" placeholder="e.g. payment terms, deposit, what's included"></textarea></div>
+        </div>
+        <p class="o-hint" id="next-number-preview"></p>
+      </div>
+      <div class="o-card">
+        <h2>Backup and other devices</h2>
+        <p class="o-sub">Your quotes and prices are saved in this browser, on this device only. Nothing is uploaded. To keep a copy, or to share with the other owner, save a backup file and import it on the other device. Importing combines it with what's already there, and the most recently edited version of each quote wins.</p>
+        <p class="o-static" id="last-backup"></p>
+        <div class="btn-row">
+          <button class="btn btn--primary btn--sm" type="button" data-action="export">Save backup file</button>
+          <label class="btn btn--outline btn--sm o-file">Import backup<input type="file" accept="application/json,.json" id="import-file"></label>
+        </div>
+        <hr class="o-rule">
+        <button class="btn btn--outline btn--sm o-danger" type="button" data-action="wipe">Delete everything on this device</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog class="o-dialog" id="picker" aria-labelledby="picker-title">
+  <div class="o-dialog__head"><h2 id="picker-title">Add from price list</h2><button class="o-icon-btn" type="button" data-close aria-label="Close">&times;</button></div>
+  <input class="o-search" type="search" id="picker-search" placeholder="Search items" aria-label="Search price list">
+  <div class="o-picker-list" id="picker-list"></div>
+</dialog>
+
+<dialog class="o-dialog o-dialog--wide" id="preview" aria-labelledby="preview-title">
+  <div class="o-dialog__head"><h2 id="preview-title">Preview</h2><button class="o-icon-btn" type="button" data-close aria-label="Close">&times;</button></div>
+  <p class="o-hint">To save a PDF: tap Print, then choose Save as PDF (on iPhone, use the Share button in the print screen and choose Save to Files).</p>
+  <div class="o-preview" id="preview-doc"></div>
+  <div class="btn-row o-dialog__foot"><button class="btn btn--primary" type="button" data-action="print">Print or save PDF</button></div>
+</dialog>
+
+<div class="quote-doc" id="quote-doc" aria-hidden="true"></div>
+<div class="o-toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "mesh-systems-website",
+  "private": true,
+  "type": "module",
+  "description": "Static website for Mesh Systems. No build step. middleware.js protects the owners area on Vercel."
+}

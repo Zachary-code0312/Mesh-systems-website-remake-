@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owners sign in | Mesh Systems</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0d1420">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<style>
+  body { background: var(--ink); min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; }
+  .login { width: 100%; max-width: 420px; }
+  .login .logo { margin-bottom: 28px; }
+  .login-card { background: var(--card); border-radius: 22px; padding: clamp(24px, 6vw, 36px); box-shadow: var(--shadow-lg); }
+  .login-card h1 { font-size: 1.6rem; margin-bottom: 6px; }
+  .login-card > p { color: var(--muted); margin-bottom: 22px; }
+  .login-card .field { margin-bottom: 16px; }
+  .remember { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; margin: 4px 0 22px; cursor: pointer; }
+  .remember input { width: 20px; height: 20px; accent-color: var(--blue-btn); }
+  .login-card .btn { width: 100%; }
+  .notice { padding: 12px 14px; border-radius: 12px; font-size: 0.92rem; margin-bottom: 18px; }
+  .notice--err { background: #fdf0ea; color: #7c2d12; border: 1px solid #f3c7b1; }
+  .notice--ok { background: #e9f7ef; color: #14532d; border: 1px solid #b7e2c7; }
+  .login-foot { margin-top: 20px; text-align: center; font-size: 0.9rem; }
+  .login-foot a { color: var(--on-dark-muted); text-decoration: none; }
+  .login-foot a:hover { color: #fff; }
+  @view-transition { navigation: none; }
+</style>
+</head>
+<body>
+<main class="login">
+  <a class="logo" href="/" aria-label="Mesh Systems website">mesh<span class="logo__dot" aria-hidden="true"></span></a>
+  <div class="login-card">
+    <h1>Owners area</h1>
+    <p>Sign in to quotes and price lists.</p>
+    <p class="notice notice--err" id="login-error" hidden role="alert">That password didn't work. Please try again.</p>
+    <p class="notice notice--ok" id="login-out" hidden role="status">You're signed out.</p>
+    <form method="post" action="/owners/login">
+      <input type="hidden" name="next" id="next" value="/owners">
+      <input type="text" name="username" value="owner" autocomplete="username" hidden aria-hidden="true" tabindex="-1">
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required autofocus>
+      </div>
+      <label class="remember"><input type="checkbox" name="remember" checked> Keep me signed in on this device</label>
+      <button class="btn btn--primary" type="submit">Sign in</button>
+    </form>
+  </div>
+  <p class="login-foot"><a href="/">Back to the website</a></p>
+</main>
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    if (q.get('error')) document.getElementById('login-error').hidden = false;
+    if (q.get('signed_out')) document.getElementById('login-out').hidden = false;
+    var next = q.get('next');
+    if (next && next.indexOf('/owners') === 0) document.getElementById('next').value = next;
+  })();
+</script>
+</body>
+</html>

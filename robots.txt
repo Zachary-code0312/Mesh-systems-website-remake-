@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /owners
 
 Sitemap: https://meshsystems.co.uk/sitemap.xml
