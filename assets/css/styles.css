@@ -48,7 +48,8 @@
 
 /* 2. Base --------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); background: var(--ink); }
+a, button, input, select, textarea, label { -webkit-tap-highlight-color: transparent; }
 body {
   margin: 0;
   font-family: var(--font-body);
@@ -59,6 +60,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 img, svg, video, canvas { display: block; max-width: 100%; }
 a { color: var(--blue-ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
@@ -277,7 +279,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
   margin-top: calc(var(--header-h) * -1);
   padding-top: var(--header-h);
 }
-.hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.9; }
+.hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: 0; transition: opacity 1.2s ease; }
+.hero__canvas.is-ready { opacity: 0.9; }
+@media (max-width: 700px) { .hero__canvas.is-ready { opacity: 0.75; } }
 .hero::after {
   content: ""; position: absolute; inset: auto 0 0; height: 160px; z-index: -1;
   background: linear-gradient(to bottom, transparent, var(--ink));
@@ -729,7 +733,7 @@ fieldset.field { border: 0; margin: 0; padding: 0; min-width: 0; }
 .center { text-align: center; }
 .stack > * + * { margin-top: 16px; }
 
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
 .reveal.is-visible { opacity: 1; transform: none; }
 .reveal-delay-1 { transition-delay: 0.08s; } .reveal-delay-2 { transition-delay: 0.16s; } .reveal-delay-3 { transition-delay: 0.24s; }
 .no-js .reveal { opacity: 1; transform: none; }
@@ -769,3 +773,19 @@ fieldset.field { border: 0; margin: 0; padding: 0; min-width: 0; }
 .dropdown__all svg { width: 16px; height: 16px; flex: none; }
 .intro-quote { margin: 0; }
 @media (max-width: 379px) { .btn.header-cta { display: none; } }
+
+/* Smoothness ---------------------------------------------------------------- */
+/* Phones: a solid header scrolls more smoothly than a blurred one. */
+@media (max-width: 1079px) {
+  .site-header { background: rgba(13, 20, 32, 0.97); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+/* Single-column layouts: no staggered delays, so content doesn't lag behind the scroll. */
+@media (max-width: 700px) {
+  .reveal-delay-1, .reveal-delay-2, .reveal-delay-3 { transition-delay: 0s; }
+}
+/* Gentle cross-fade between pages, with the header staying put (Chrome, Edge, Safari 18.2+). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.25s; }
+  .site-header { view-transition-name: site-header; }
+}

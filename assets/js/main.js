@@ -65,7 +65,7 @@
       entries.forEach(function (entry) {
         if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
       });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    }, { rootMargin: "0px 0px -4% 0px", threshold: 0.01 });
     reveals.forEach(function (el) { io.observe(el); });
   } else {
     reveals.forEach(function (el) { el.classList.add("is-visible"); });
@@ -74,96 +74,133 @@
   /* ---------- Footer year ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
-  /* ---------- Hero mesh network animation ---------- */
+  /* ---------- Hero mesh network animation ----------
+     The canvas re-measures itself whenever its box changes size (fonts loading,
+     text reflowing, phone rotation), so the drawing is never stretched.
+     Movement is time-based, so it runs at the same speed on 60Hz and 120Hz screens. */
   var canvas = document.querySelector(".hero__canvas");
   if (canvas && canvas.getContext) {
     var ctx = canvas.getContext("2d");
-    var nodes = [], w = 0, h = 0, dpr = 1, running = true, raf = 0;
-    var LINK = 150;
+    var nodes = [], w = 0, h = 0, dpr = 1, link = 150, running = false, raf = 0, last = 0, inView = true;
+    var BUCKETS = 6, MAX_ALPHA = 0.36;
 
-    function build() {
-      var rect = canvas.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = rect.width; h = rect.height;
-      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    function targetCount() {
+      var perNode = w < 700 ? 9500 : 16000;
+      return Math.round(Math.min(80, Math.max(20, (w * h) / perNode)));
+    }
+    function makeNode() {
+      return {
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.5) * 14, // px per second
+        hub: Math.random() < 0.14, r: Math.random() < 0.14 ? 2.4 : 1.4,
+        phase: Math.random() * Math.PI * 2
+      };
+    }
+    function fit() {
+      var cw = canvas.clientWidth, ch = canvas.clientHeight;
+      var ratio = Math.min(window.devicePixelRatio || 1, 2);
+      if (!cw || !ch || (cw === w && ch === h && ratio === dpr)) return false;
+      var sx = w ? cw / w : 1, sy = h ? ch / h : 1;
+      w = cw; h = ch; dpr = ratio;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      LINK = w < 700 ? 110 : 160;
-      var count = Math.round(Math.min(90, Math.max(28, (w * h) / 16000)));
-      nodes = [];
-      for (var i = 0; i < count; i++) {
-        nodes.push({
-          x: Math.random() * w, y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
-          r: Math.random() < 0.14 ? 2.6 : 1.4,
-          hub: Math.random() < 0.14,
-          phase: Math.random() * Math.PI * 2
-        });
-      }
+      link = w < 700 ? 135 : 160;
+      for (var i = 0; i < nodes.length; i++) { nodes[i].x *= sx; nodes[i].y *= sy; }
+      var target = targetCount();
+      while (nodes.length < target) nodes.push(makeNode());
+      if (nodes.length > target) nodes.length = target;
+      return true;
     }
 
     function draw(t) {
       ctx.clearRect(0, 0, w, h);
-      var i, j, a, b, dx, dy, d;
+      var link2 = link * link, i, j, a, b, dx, dy, d2, alpha, k;
+      // Group lines into a few opacity levels so each level is one stroke call.
+      var buckets = [];
+      for (k = 0; k < BUCKETS; k++) buckets.push([]);
       for (i = 0; i < nodes.length; i++) {
         a = nodes[i];
         for (j = i + 1; j < nodes.length; j++) {
           b = nodes[j];
-          dx = a.x - b.x; dy = a.y - b.y; d = Math.sqrt(dx * dx + dy * dy);
-          if (d < LINK) {
-            var alpha = (1 - d / LINK) * ((a.hub || b.hub) ? 0.36 : 0.18);
-            ctx.strokeStyle = "rgba(143,189,232," + alpha.toFixed(3) + ")";
-            ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-          }
+          dx = a.x - b.x; if (dx > link || dx < -link) continue;
+          dy = a.y - b.y; if (dy > link || dy < -link) continue;
+          d2 = dx * dx + dy * dy;
+          if (d2 >= link2) continue;
+          alpha = (1 - Math.sqrt(d2) / link) * ((a.hub || b.hub) ? MAX_ALPHA : MAX_ALPHA / 2);
+          k = Math.min(BUCKETS - 1, Math.floor((alpha / MAX_ALPHA) * BUCKETS));
+          buckets[k].push(a.x, a.y, b.x, b.y);
         }
       }
+      ctx.lineWidth = 1;
+      for (k = 0; k < BUCKETS; k++) {
+        var seg = buckets[k];
+        if (!seg.length) continue;
+        ctx.strokeStyle = "rgba(143,189,232," + (((k + 0.5) / BUCKETS) * MAX_ALPHA).toFixed(3) + ")";
+        ctx.beginPath();
+        for (var s = 0; s < seg.length; s += 4) { ctx.moveTo(seg[s], seg[s + 1]); ctx.lineTo(seg[s + 2], seg[s + 3]); }
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(200,220,240,0.55)";
+      ctx.beginPath();
       for (i = 0; i < nodes.length; i++) {
         a = nodes[i];
-        if (a.hub) {
-          var pulse = (Math.sin(t / 900 + a.phase) + 1) / 2;
-          ctx.fillStyle = "rgba(61,133,198," + (0.12 + pulse * 0.18).toFixed(3) + ")";
-          ctx.fillRect(a.x - 7 - pulse * 3, a.y - 7 - pulse * 3, 14 + pulse * 6, 14 + pulse * 6);
-          ctx.fillStyle = "#3d85c6";
-          ctx.fillRect(a.x - 3, a.y - 3, 6, 6);
-        } else {
-          ctx.fillStyle = "rgba(200,220,240,0.55)";
-          ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2); ctx.fill();
-        }
+        if (a.hub) continue;
+        ctx.moveTo(a.x + a.r, a.y);
+        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+      }
+      ctx.fill();
+      for (i = 0; i < nodes.length; i++) {
+        a = nodes[i];
+        if (!a.hub) continue;
+        var pulse = (Math.sin(t / 900 + a.phase) + 1) / 2, size = 14 + pulse * 6;
+        ctx.fillStyle = "rgba(61,133,198," + (0.12 + pulse * 0.18).toFixed(3) + ")";
+        ctx.fillRect(a.x - size / 2, a.y - size / 2, size, size);
+        ctx.fillStyle = "#3d85c6";
+        ctx.fillRect(a.x - 3, a.y - 3, 6, 6);
       }
     }
 
-    function step(t) {
+    function step(now) {
+      var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
       for (var i = 0; i < nodes.length; i++) {
         var n = nodes[i];
-        n.x += n.vx; n.y += n.vy;
+        n.x += n.vx * dt; n.y += n.vy * dt;
         if (n.x < -20) n.x = w + 20; else if (n.x > w + 20) n.x = -20;
         if (n.y < -20) n.y = h + 20; else if (n.y > h + 20) n.y = -20;
       }
-      draw(t);
+      draw(now);
       if (running) raf = requestAnimationFrame(step);
     }
-
-    build();
-    if (reduceMotion) {
-      draw(0);
-    } else {
-      raf = requestAnimationFrame(step);
-      if ("IntersectionObserver" in window) {
-        new IntersectionObserver(function (entries) {
-          var visible = entries[0].isIntersecting;
-          if (visible && !running) { running = true; raf = requestAnimationFrame(step); }
-          else if (!visible) { running = false; cancelAnimationFrame(raf); }
-        }).observe(canvas);
-      }
-      document.addEventListener("visibilitychange", function () {
-        if (document.hidden) { running = false; cancelAnimationFrame(raf); }
-        else if (!running) { running = true; raf = requestAnimationFrame(step); }
-      });
+    function start() {
+      if (running || reduceMotion || !inView || document.hidden || !w) return;
+      running = true; last = 0; raf = requestAnimationFrame(step);
     }
-    var resizeTimer;
-    window.addEventListener("resize", function () {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function () { build(); if (reduceMotion) draw(0); }, 150);
+    function stop() { running = false; cancelAnimationFrame(raf); }
+    function refit() {
+      if (fit()) {
+        draw(performance.now());
+        canvas.classList.add("is-ready");
+        start();
+      }
+    }
+
+    refit();
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(refit).observe(canvas);
+    } else {
+      window.addEventListener("resize", refit);
+      window.addEventListener("load", refit);
+    }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        inView = entries[0].isIntersecting;
+        if (inView) start(); else stop();
+      }).observe(canvas);
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) stop(); else start();
     });
   }
 
