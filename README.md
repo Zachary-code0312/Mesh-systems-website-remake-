@@ -47,6 +47,8 @@ python3 -m http.server 8000
 
 **GitHub Pages:** in the repository settings, go to Pages, choose "Deploy from a branch", pick the branch and the `/ (root)` folder. To use `meshsystems.co.uk`, add the domain under Pages > Custom domain and point the domain's DNS at GitHub.
 
+**Vercel:** import the repository at vercel.com, choose the "Other" framework preset, leave the build command empty, and deploy. `vercel.json` turns on clean URLs, so `/about` serves `about.html` and the old site's addresses keep working.
+
 **Netlify / Cloudflare Pages:** connect the repository. Leave the build command empty and set the publish directory to the repository root.
 
 `404.html` uses links that start with `/`, so it works best on the real domain (or any host where the site sits at the root).
